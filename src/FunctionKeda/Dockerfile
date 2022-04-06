@@ -6,7 +6,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["FunctionKeda.csproj", "src/FunctionKeda/"]
+COPY ["src/FunctionKeda/FunctionKeda.csproj", "src/FunctionKeda/"]
 RUN dotnet restore "src/FunctionKeda/FunctionKeda.csproj"
 COPY . .
 WORKDIR "/src/src/FunctionKeda"
