@@ -11,7 +11,7 @@ namespace FunctionKeda
         public static void Run([ServiceBusTrigger("queue-product-added-updated", Connection = "ServiceBusConnection")]string product, ILogger log)
         {
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {product}");
-            Thread.Sleep(TimeSpan.FromSeconds(2));
+            Thread.Sleep(TimeSpan.FromSeconds(10));
         }
     }
 }
