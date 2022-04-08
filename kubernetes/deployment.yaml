@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: function-keda
+  namespace: keda
+  labels:
+    app: function-keda
+spec:
+  selector:
+    matchLabels:
+      app: function-keda
+  template:
+    metadata:
+      labels:
+        app: function-keda
+    spec:
+      containers:
+      - name: function-keda
+        image: ghcr.io/lucianoeger/functionkeda:master
+        imagePullPolicy: Always
+        env:
+        - name: ServiceBusConnection
+          value: "{servicebuskey}"
+      imagePullSecrets:
+        - name: github-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: function-keda
+  namespace: keda
+  labels:
+    app: function-keda  
+spec:
+  selector:
+    app: function-keda
+  ports:
+    - protocol: TCP
+      port: 80
+  type: LoadBalancer

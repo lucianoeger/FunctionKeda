@@ -1,0 +1,51 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: github-secret
+  namespace: keda
+data:
+  .dockerconfigjson: >-
+    {base64token}
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: trigger-auth-service-bus-function-keda
+  namespace: keda
+spec:
+  secretTargetRef:
+  - parameter: connection
+    name: secrets-function-keda-management
+    key: servicebus-connectionstring
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: keda
+  name: secrets-function-keda-management
+  labels:
+    app: function-keda
+data:
+  servicebus-connectionstring: {servicebuskeybase64}
+---
+apiVersion: keda.sh/v1alpha1 
+kind: ScaledObject
+metadata:
+  namespace: keda
+  name: function-keda-scaler
+spec:
+  scaleTargetRef:
+    name: function-keda
+  minReplicaCount: 0 # Change to define how many minimum replicas you want
+  maxReplicaCount: 50
+  # The period to wait after the last trigger reported active before scaling the resource back to 0.
+  # By default it’s 5 minutes (300 seconds).
+  cooldownPeriod: 60
+  triggers:
+  - type: azure-servicebus
+    metadata:
+      queueName: queue-product-added-updated
+      messageCount: '10'
+    authenticationRef:
+      name: trigger-auth-service-bus-function-keda
